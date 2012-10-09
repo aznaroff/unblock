@@ -1,0 +1,11 @@
+CACHE MANIFEST
+
+index.html
+levels/beginner/original.js
+js/levelsLoader.js
+js/gameDataLogic.js
+js/abstractVisualRepresentation.js
+js/html5CanvasRender.js
+img/favicon.png
+img/icon175x175.png
+#v70
