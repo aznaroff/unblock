@@ -264,26 +264,20 @@ function Visual(game) {
 		}
 	};
 	this.pointerDown = function(x, y) {
+		moved = false;
 		var block = getBlock(x, y);
 		if(block) {
 			lastBlock = block;
 			var visualBlock = elements.grille.blocks[block.index];
 			dragging = true;
-			moved = false;
 			start.x = x;
 			start.y = y;
 			updateBlock(visualBlock, block);
 		}
-		if(x >= elements.controls.leftArrow.left && x <= elements.controls.leftArrow.right && y >= elements.controls.leftArrow.top && y <= elements.controls.leftArrow.bottom) {
-			game.previousLevel();
-		}
-		if(x >= elements.controls.rightArrow.left && x <= elements.controls.rightArrow.right && y >= elements.controls.rightArrow.top && y <= elements.controls.rightArrow.bottom) {
-			game.nextLevel();
-		}
 	};
 	this.pointerMove = function(x, y) {
+		moved = true;
 		if(dragging) {
-			moved = true;
 			smoothMoveBlock(lastBlock, x, y);
 		} else {
 			if(x >= elements.grille.left && x <= elements.grille.right && y >= elements.grille.top && y <= elements.grille.bottom) {
@@ -313,6 +307,12 @@ function Visual(game) {
 				}
 			} else
 				moveBlock(lastBlock, x, y);
+		}
+		if(!moved && x >= elements.controls.leftArrow.left && x <= elements.controls.leftArrow.right && y >= elements.controls.leftArrow.top && y <= elements.controls.leftArrow.bottom) {
+			game.previousLevel();
+		}
+		if(!moved && x >= elements.controls.rightArrow.left && x <= elements.controls.rightArrow.right && y >= elements.controls.rightArrow.top && y <= elements.controls.rightArrow.bottom) {
+			game.nextLevel();
 		}
 		dragging = false;
 	};
