@@ -47,6 +47,7 @@ function Visual(game) {
 	};
 	var lastBlock = null;
 	var dragging = false;
+	var moved = false;
 	var start = {
 		x: 0,
 		y: 0
@@ -268,6 +269,7 @@ function Visual(game) {
 			lastBlock = block;
 			var visualBlock = elements.grille.blocks[block.index];
 			dragging = true;
+			moved = false;
 			start.x = x;
 			start.y = y;
 			updateBlock(visualBlock, block);
@@ -281,6 +283,7 @@ function Visual(game) {
 	};
 	this.pointerMove = function(x, y) {
 		if(dragging) {
+			moved = true;
 			smoothMoveBlock(lastBlock, x, y);
 		} else {
 			if(x >= elements.grille.left && x <= elements.grille.right && y >= elements.grille.top && y <= elements.grille.bottom) {
@@ -293,7 +296,23 @@ function Visual(game) {
 	};
 	this.pointerUp = function(x, y) {
 		if(dragging) {
-			moveBlock(lastBlock, x, y);
+			if(!moved) {
+				var visualBlock = elements.grille.blocks[lastBlock.index];
+				if(lastBlock.orientation == "horizontal") {
+					x -= visualBlock.left;
+					if(x > Math.floor((visualBlock.right - visualBlock.left)/2))
+						game.moveBlock(lastBlock, 1);
+					else
+						game.moveBlock(lastBlock, -1);
+				} else {
+					y -= visualBlock.top;
+					if(y > Math.floor((visualBlock.bottom - visualBlock.top)/2))
+						game.moveBlock(lastBlock, 1);
+					else
+						game.moveBlock(lastBlock, -1);
+				}
+			} else
+				moveBlock(lastBlock, x, y);
 		}
 		dragging = false;
 	};
