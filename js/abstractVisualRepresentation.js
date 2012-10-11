@@ -307,12 +307,13 @@ function Visual(game) {
 				}
 			} else
 				moveBlock(lastBlock, x, y);
-		}
-		if(!moved && x >= elements.controls.leftArrow.left && x <= elements.controls.leftArrow.right && y >= elements.controls.leftArrow.top && y <= elements.controls.leftArrow.bottom) {
-			game.previousLevel();
-		}
-		if(!moved && x >= elements.controls.rightArrow.left && x <= elements.controls.rightArrow.right && y >= elements.controls.rightArrow.top && y <= elements.controls.rightArrow.bottom) {
-			game.nextLevel();
+		} else {
+			if(!moved && x >= elements.controls.leftArrow.left && x <= elements.controls.leftArrow.right && y >= elements.controls.leftArrow.top && y <= elements.controls.leftArrow.bottom) {
+				game.previousLevel();
+			}
+			if(!moved && x >= elements.controls.rightArrow.left && x <= elements.controls.rightArrow.right && y >= elements.controls.rightArrow.top && y <= elements.controls.rightArrow.bottom) {
+				game.nextLevel();
+			}
 		}
 		dragging = false;
 	};
