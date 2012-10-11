@@ -1,0 +1,271 @@
+<fieldset>
+	<legend>Controls<legend>
+	<button id="previous">previous</button>
+	<span id="info"></span>
+	<button id="next">next</button>
+	<button id="add">add</button>
+	<button id="remove">remove</button>
+	<input type="file" id="upload" />
+	<a id="download">Telecharger</a>
+</fieldset>
+<fieldset>
+	<legend>Block<legend>
+	<input name="block" type="radio" value="1" id="2x1" checked="checked" /><label for="2x1">2x1</label>
+	<input name="block" type="radio" value="2" id="1x2" /><label for="1x2">1x2</label>
+	<input name="block" type="radio" value="3" id="3x1" /><label for="3x1">3x1</label>
+	<input name="block" type="radio" value="4" id="1x3" /><label for="1x3">1x3</label>
+	<input name="block" type="radio" value="0" id="clear" /><label for="clear">clear</label>
+</fieldset>
+<canvas width="300" height="300" id="grille"></canvas>
+<script>
+	var ctx = document.querySelector("#grille").getContext("2d");
+	
+	//init
+	var maps = new Array(new Array());
+	var current_map = 0;
+	var collisions = new Array();
+	for(var i=0; i<6; i++)
+		collisions.push(new Array(null, null, null, null, null, null));
+
+	//current_map manipulation
+	var padding = 4;
+	function afficher_grille() {
+		//info
+		document.querySelector("#info").innerText = (current_map + 1) + '/' + maps.length;
+		
+		//clear
+		ctx.clearRect(0, 0, 300, 300);
+		
+		//grille
+		for(var i=0; i<36; i++) {
+			ctx.strokeRect(i%6*50, Math.floor(i/6)*50, 50, 50);
+		}
+		
+		//elements
+		for(var i=0; i<maps[current_map].length; i++) {
+			if(maps[current_map][i].important)
+				ctx.fillStyle = "#f00";
+			else
+				ctx.fillStyle = "#000";
+			if(maps[current_map][i].orientation == "horizontal")
+				ctx.fillRect(maps[current_map][i].coord.x*50+padding, maps[current_map][i].coord.y*50+padding, 50*maps[current_map][i].size-2*padding, 50-2*padding);
+			else
+				ctx.fillRect(maps[current_map][i].coord.x*50+padding, maps[current_map][i].coord.y*50+padding, 50-2*padding, 50*maps[current_map][i].size-2*padding);
+		}
+	}
+	function generate_collisions_map() {
+		collisions = new Array();
+		for(var i=0; i<6; i++)
+			collisions.push(new Array(null, null, null, null, null, null));
+		for(var i=0; i<maps[current_map].length; i++) {
+			if(maps[current_map][i].orientation == "horizontal") {
+				collisions[maps[current_map][i].coord.x][maps[current_map][i].coord.y] = maps[current_map][i];
+				collisions[maps[current_map][i].coord.x+1][maps[current_map][i].coord.y] = maps[current_map][i];
+				if(maps[current_map][i].size == 3)
+					collisions[maps[current_map][i].coord.x+2][maps[current_map][i].coord.y] = maps[current_map][i];
+			} else {
+				collisions[maps[current_map][i].coord.x][maps[current_map][i].coord.y] = maps[current_map][i];
+				collisions[maps[current_map][i].coord.x][maps[current_map][i].coord.y+1] = maps[current_map][i];
+				if(maps[current_map][i].size == 3)
+					collisions[maps[current_map][i].coord.x][maps[current_map][i].coord.y+2] = maps[current_map][i];
+			}
+		}
+	}
+	
+	function get_type() {
+		return parseInt(document.querySelector("input[type=\"radio\"]:checked").value);
+	}
+	
+	document.querySelector("#grille").addEventListener("mousedown", function(event) {
+		var x = Math.floor((event.pageX-this.offsetLeft)/50);
+		var y = Math.floor((event.pageY-this.offsetTop)/50);
+		var type = get_type();
+		
+		switch(type) {
+			case 0:
+				if(collisions[x][y])
+					maps[current_map].splice(maps[current_map].indexOf(collisions[x][y]), 1);
+			break;
+			case 1:
+				if(x < 5 && !collisions[x][y] && !collisions[x+1][y]) {
+					var element = {
+						orientation : "horizontal",
+						size : 2,
+						coord : {
+							x : x,
+							y : y
+						}
+					};
+					maps[current_map].push(element);
+				}
+			break;
+			case 2:
+				if(y < 5 && !collisions[x][y] && !collisions[x][y+1]) {
+					var element = {
+						orientation : "vertical",
+						size : 2,
+						coord : {
+							x : x,
+							y : y
+						}
+					};
+					maps[current_map].push(element);
+				}
+			break;
+			case 3:
+				if(x < 4 && !collisions[x][y] && !collisions[x+1][y] && !collisions[x+2][y]) {
+					var element = {
+						orientation : "horizontal",
+						size : 3,
+						coord : {
+							x : x,
+							y : y
+						}
+					};
+					maps[current_map].push(element);
+				}
+			break;
+			case 4:
+				if(y < 4 && !collisions[x][y] && !collisions[x][y+1] && !collisions[x][y+2]) {
+					var element = {
+						orientation : "vertical",
+						size : 3,
+						coord : {
+							x : x,
+							y : y
+						}
+					};
+					maps[current_map].push(element);
+				}
+			break;
+		}
+		generate_collisions_map();
+		afficher_grille();
+	}, false);
+	
+	//maps manipulation
+	function check() {
+		//colonnes
+		for(var i=0; i<6; i++) {
+			var elements = new Array();
+			var j = 0;
+			while(j < 6) {
+				if(collisions[i][j] && collisions[i][j].orientation == "vertical") {
+					elements.push(collisions[i][j]);
+					j += collisions[i][j].size;
+				} else
+					j++;
+			}
+			if(elements.length > 2)
+				return false;
+			if(elements.length == 2 && (elements[0].size == 3 || elements[1].size == 3))
+				return false;
+		}
+		//lignes
+		for(var i=0; i<6; i++) {
+			var elements = new Array();
+			var j = 0;
+			while(j < 6) {
+				if(collisions[j][i] && collisions[j][i].orientation == "horizontal") {
+					elements.push(collisions[j][i]);
+					j += collisions[j][i].size;
+				} else
+					j++;
+			}
+			if(elements.length > 2)
+				return false;
+			if(elements.length == 2 && (elements[0].size == 3 || elements[1].size == 3))
+				return false;
+		}
+		//red block
+		var elements = new Array();
+		var j = 0;
+		while(j < 6) {
+			if(collisions[j][2] && collisions[j][2].orientation == "horizontal") {
+				elements.push(collisions[j][2]);
+				j += collisions[j][2].size;
+			} else
+				j++;
+		}
+		if(elements.length == 1 && elements[0].size == 2)
+			return true;
+		else
+			return false;
+	}
+	
+	function arrange() {
+		for(var i=0; i<maps[current_map].length; i++)
+			if(maps[current_map][i].coord.y == 2 && maps[current_map][i].orientation == "horizontal")
+				maps[current_map][i].important = true;
+	}
+	
+	document.querySelector("#add").addEventListener("mousedown", function() {
+		if(check()) {
+			arrange();
+			maps.push(new Array());
+			current_map = maps.length - 1;
+			generate_collisions_map();
+			afficher_grille();
+		} else
+			alert("invalid map");
+	}, false);
+	
+	document.querySelector("#remove").addEventListener("mousedown", function() {
+		maps.splice(current_map, 1);
+		current_map--;
+		if(current_map == -1)
+			current_map = 0;
+		if(maps.length == 0)
+			maps.push(new Array());
+		generate_collisions_map();
+		afficher_grille();
+	}, false);
+	
+	document.querySelector("#next").addEventListener("mousedown", function() {
+		if(check()) {
+			arrange();
+			current_map++;
+			if(current_map == maps.length)
+				current_map = 0;
+			generate_collisions_map();
+			afficher_grille();
+		} else
+			alert("invalid map");
+	}, false);
+	
+	document.querySelector("#previous").addEventListener("mousedown", function() {
+		if(check()) {
+			arrange();
+			current_map--;
+			if(current_map == -1)
+				current_map = maps.length - 1;
+			generate_collisions_map();
+			afficher_grille();
+		} else
+			alert("invalid map");
+	}, false);
+	
+	var name = "default.json";
+	document.querySelector("#upload").addEventListener("change", function() {
+		var file = event.target.files[0];
+		var reader = new FileReader();
+		reader.onload = function(event) {
+			name = file.name;
+			maps = JSON.parse(event.target.result);
+			current_map = 0;
+			generate_collisions_map();
+			afficher_grille();
+		};
+		reader.readAsText(file);
+	}, false);
+	
+	document.querySelector("#download").addEventListener("mousedown", function() {
+		var blob = new Blob([JSON.stringify(maps, null, '\t')], { "type" : "text\/plain" });
+		this.download = name;
+		this.href = window.webkitURL.createObjectURL(blob);
+	}, false);
+	
+	//main
+	generate_collisions_map();
+	afficher_grille();
+</script>

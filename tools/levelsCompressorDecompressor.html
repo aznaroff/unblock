@@ -1,0 +1,125 @@
+<form>
+	<fieldset>
+		<legend>Compressor</legend>
+		<input type="file" id="upload-compressor" />
+		<a id="download-compressor"></a>
+	</fieldset>
+	<fieldset>
+		<legend>Decompressor</legend>
+		<input type="file" id="upload-decompressor" />
+		<a id="download-decompressor"></a>
+	</fieldset>
+</form>
+<script>
+	//compressor
+	document.querySelector("#upload-compressor").addEventListener("change", function(event) {
+		var file = event.target.files[0];
+		var reader = new FileReader();
+		reader.onload = function(event) {
+			var maps = compress(JSON.parse(event.target.result));
+			var blob = new Blob([compress_js(maps)], { "type" : "text\/plain" });
+			var download = document.querySelector("#download-compressor");
+			download.href = window.webkitURL.createObjectURL(blob);
+			var name = file.name.split('.')[0]+".js";
+			download.download = name;
+			download.innerText = name;
+		};
+		reader.readAsText(file);
+	}, false);
+	
+	function compress(maps_decompressed) {
+		var maps = new Array();
+		for(var i=0; i<maps_decompressed.length; i++) {
+			var map = '';
+			for(var j=0; j<maps_decompressed[i].length; j++) {
+				var coord = maps_decompressed[i][j].coord.x + maps_decompressed[i][j].coord.y*6;
+				if(coord < 10)
+					coord = '0'+coord;
+				map += coord;
+				if(maps_decompressed[i][j].orientation == "horizontal") {
+					if(maps_decompressed[i][j].size == 2)
+						map += 1;
+					else
+						map += 3;
+				} else {
+					if(maps_decompressed[i][j].size == 2)
+						map += 2;
+					else
+						map += 4;
+				}
+			}
+			maps.push(map);
+		}
+		return maps;
+	}
+	
+	function compress_js(maps_compressed) {
+		var string = "var string =\"\\\n";
+		for(var i=0; i<maps_compressed.length-1; i++)
+			string += maps_compressed[i] + "\\n\\\n";
+		string += maps_compressed[maps_compressed.length-1] + "\\\n\";";
+		return string;
+	}
+	
+	//decompressor
+	document.querySelector("#upload-decompressor").addEventListener("change", function(event) {
+		var file = event.target.files[0];
+		var reader = new FileReader();
+		reader.onload = function(event) {
+			var maps = decompress(decompress_js(event.target.result));
+			var blob = new Blob([JSON.stringify(maps, null, '\t')], { "type" : "text\/plain" });
+			var download = document.querySelector("#download-decompressor");
+			download.href = window.webkitURL.createObjectURL(blob);
+			var name = file.name.split('.')[0]+".json";
+			download.download = name;
+			download.innerText = name;
+		};
+		reader.readAsText(file);
+	}, false);
+	
+	function decompress_js(string) {
+		var maps_compressed = string.replace(/\\n\\/g,'').replace(/\\/g,'').split('\n');
+		maps_compressed.splice(0, 1);
+		maps_compressed.splice(maps_compressed.length-2, 2);
+		return maps_compressed;
+	}
+	
+	function decompress(maps_compressed) {
+		var maps = new Array();
+		for(var i=0; i<maps_compressed.length; i++) {
+			var map = new Array();
+			for(var j=0; j<maps_compressed[i].length/3; j++) {
+				var coord = parseInt(maps_compressed[i][j*3]+maps_compressed[i][j*3+1], 10);
+				var type = parseInt(maps_compressed[i][j*3+2], 10);
+				var element = new Object;
+				element.coord = {
+					x : coord%6,
+					y : Math.floor(coord/6)
+				};
+				switch(type) {
+					case 1:
+						element.size = 2;
+						element.orientation = "horizontal";
+						if(element.coord.y == 2)
+							element.important = true;
+					break;
+					case 2:
+						element.size = 2;
+						element.orientation = "vertical";
+					break;
+					case 3:
+						element.size = 3;
+						element.orientation = "horizontal";
+					break;
+					case 4:
+						element.size = 3;
+						element.orientation = "vertical";
+					break;
+				}
+				map.push(element);
+			}
+			maps.push(map);
+		}
+		return maps;
+	}
+</script>
