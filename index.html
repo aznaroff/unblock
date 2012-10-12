@@ -47,6 +47,7 @@
 			var game = new Game();
 			var visual = new Visual(game);
 			var render = new Render(visual, "canvas");
+			var canvas = document.querySelector("#canvas");
 			window.addEventListener("resize", function() {
 				canvas.width=window.innerWidth;
 				canvas.height=window.innerHeight;
