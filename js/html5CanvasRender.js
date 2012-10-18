@@ -118,8 +118,8 @@ function Render(visual, id) {
 		
 		
 		ctx.fillStyle = popupConfig.fontColor;
-		ctx.font = "9px monospace";
-		ctx.font = ((popupConfig.width/6)/(ctx.measureText(popupConfig.winMessage).width/35)) +"px monospace";
+		ctx.font = "9px arial";
+		ctx.font = ((popupConfig.width/6)/(ctx.measureText(popupConfig.winMessage).width/35)) +"px arial";
 		ctx.textBaseline = "middle";
 		ctx.textAlign = "center";
 
@@ -138,7 +138,7 @@ function Render(visual, id) {
 			var element = elements.controls[x];
 			if(typeof element == "object") {
 				ctx.fillStyle = '#000';
-				ctx.font = element.fontSize+'px monospace';
+				ctx.font = element.fontSize+'px arial';
 				ctx.textAlign = "left";
 				ctx.textBaseline = "alphabetic";
 
