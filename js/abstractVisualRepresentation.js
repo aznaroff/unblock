@@ -68,6 +68,7 @@ function Visual(game) {
 		dispatch("moveblock", visualBlock);
 	}
 	function winCallback() {
+		lastBlock = null;
 		dispatch("win");
 	}
 	
