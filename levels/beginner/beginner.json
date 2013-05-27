@@ -99313,6 +99313,14 @@
 				"x": 4,
 				"y": 1
 			}
+		},
+		{
+			"orientation": "horizontal",
+			"size": 2,
+			"coord": {
+				"x": 4,
+				"y": 5
+			}
 		}
 	],
 	[
