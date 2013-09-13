@@ -1,9 +1,9 @@
 CACHE MANIFEST
 
-#v0.0.20
+#v0.0.21
 
 index.html
-levels/01 - beginner/beginner.js
+levels/01-beginner/beginner.js
 js/levelsLoader.js
 js/gameLogic.js
 js/abstractVisualRepresentation.js
