@@ -1,9 +1,4 @@
 Unblock
 ==================
 
-Scratchbook
-------------------
-
-GameDataLogic: logic consistency  
-abstractVisualRepresentation: visual consistency  
-html5CanvasRender: 2d context html canvas rendering
+[Play it](http://failon.github.io/unblock/)
