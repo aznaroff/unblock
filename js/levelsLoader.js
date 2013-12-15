@@ -1,4 +1,4 @@
-var levelsCompressed = string.split('\n');
+var levelsCompressed = levels.beginner;
 
 function loadLevel(index) {
 	var level = new Array();
