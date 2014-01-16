@@ -391,6 +391,14 @@
 			},
 			"size": 2,
 			"orientation": "horizontal"
+		},
+		{
+			"orientation": "horizontal",
+			"size": 2,
+			"coord": {
+				"x": 2,
+				"y": 4
+			}
 		}
 	],
 	[
@@ -16488,6 +16496,14 @@
 			},
 			"size": 3,
 			"orientation": "vertical"
+		},
+		{
+			"orientation": "horizontal",
+			"size": 2,
+			"coord": {
+				"x": 4,
+				"y": 5
+			}
 		}
 	],
 	[
