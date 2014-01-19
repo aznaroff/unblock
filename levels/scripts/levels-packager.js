@@ -46,7 +46,26 @@ fs.readFile("src/01-beginner/beginner.json", "utf-8", function(err, data) {
 				var expertArray = compress(JSON.parse(data));
 				levels.expert = expertArray;
 				
-				console.log("var levels = " + JSON.stringify(levels));
+				fs.readFile("src/original/01-beginner/original-beginner.json", "utf-8", function(err, data) {
+					if(err) return console.log(err);
+					var originalBeginnerArray = compress(JSON.parse(data));
+					levels.original = {};
+					levels.original.beginner = originalBeginnerArray;
+					
+					fs.readFile("src/original/02-intermediate/original-intermediate.json", "utf-8", function(err, data) {
+						if(err) return console.log(err);
+						var originalIntermediateArray = compress(JSON.parse(data));
+						levels.original.intermediate = originalIntermediateArray;
+						
+						fs.readFile("src/original/03-bonus/original-bonus.json", "utf-8", function(err, data) {
+							if(err) return console.log(err);
+							var originalBonusArray = compress(JSON.parse(data));
+							levels.original.bonus = originalBonusArray;
+				
+							console.log("var levels = " + JSON.stringify(levels));
+						});
+					});
+				});
 			});
 		});
 	});
